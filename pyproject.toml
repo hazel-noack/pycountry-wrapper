@@ -1,6 +1,8 @@
 [project]
 name = "pycountry-wrapper"
-dependencies = []
+dependencies = [
+    "pycountry~=24.6.1",
+]
 dynamic = ["version"]
 authors = []
 description = "This is a wrapper for pycountry, to make said library more usable."
