@@ -15,7 +15,9 @@ class Country:
     If the country couldn't be found, it raises the pycountry_wrapper.CountryDoesNotExist exception.
     """
 
-    def __init__(self, country: str = None, pycountry_object = None):
+    def __new__(cls, country: str = None, pycountry_object = None, silent: bool = False):
+        self = super().__new__(cls)
+
         if country is not None:
             # auto detect if alpha_2 or alpha_3
             if len(country) == 2:
@@ -24,9 +26,31 @@ class Country:
                 pycountry_object = pycountry.countries.get(alpha_3=country.upper())
 
         if pycountry_object is None:
+            if silent:
+                return None
             raise CountryDoesNotExist()
 
         self.pycountry_object = pycountry_object
+        return self     
+
+    def __init__(self, country: str = None, pycountry_object = None, silent: bool = False) -> None: ...
+
+    """
+    def __init__(self, ):
+        if country is not None:
+            # auto detect if alpha_2 or alpha_3
+            if len(country) == 2:
+                pycountry_object = pycountry.countries.get(alpha_2=country.upper())
+            elif len(country) == 3:
+                pycountry_object = pycountry.countries.get(alpha_3=country.upper())
+
+        if pycountry_object is None and not silent:
+            raise CountryDoesNotExist()
+
+        self.pycountry_object = pycountry_object
+
+        print("init")
+    """
 
     @classmethod
     def from_alpha_2(cls, alpha_2: str) -> Country:
