@@ -28,18 +28,23 @@ except CountryDoesNotExist:
 
 ### Creating country class
 
-You can call create an instance of `pycountry_wrapper.Country` in three ways.
+You can call create an instance of `pycountry_wrapper.Country` in multiple slightly different ways.
 
-Using **ISO 3166-1** with either 2 or 3 letters:
+The [**ISO 3166-1**](https://en.wikipedia.org/wiki/ISO_3166-1) standart can either use 2 or 3 letters (alpha_2 or alpha_3).
 
 ```python
 from pycountry_wrapper import Country
 
+# auto detects if alpha_2 or alpha_3
+Country("DE")
+Country("DEU")
+
+# you can specify what to use, if required.
 Country.from_alpha_2("DE")
-Country.from_alpha_2("DEU")
+Country.from_alpha_3("DEU")
 ```
 
-Or you can do a fuzzy search in a similar way:
+If you want to use fuzzy search, you will have to use `Country.from_fuzzy()`.
 
 ```python
 from pycountry_wrapper import Country
@@ -47,14 +52,6 @@ from pycountry_wrapper import Country
 Country.from_fuzzy("Deutschland")
 ```
 
-Or you can pass a pycountry object in the constructor:
-
-```python
-import pycountry
-from pycountry_wrapper import Country
-
-Country(pycountry.countries.get(alpha_2="DE"))
-```
 
 ### Accessing information
 

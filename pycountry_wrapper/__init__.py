@@ -15,7 +15,14 @@ class Country:
     If the country couldn't be found, it raises the pycountry_wrapper.CountryDoesNotExist exception.
     """
 
-    def __init__(self, pycountry_object):
+    def __init__(self, country: str = None, pycountry_object = None):
+        if country is not None:
+            # auto detect if alpha_2 or alpha_3
+            if len(country) == 2:
+                pycountry_object = pycountry.countries.get(alpha_2=country.upper())
+            elif len(country) == 3:
+                pycountry_object = pycountry.countries.get(alpha_3=country.upper())
+
         if pycountry_object is None:
             raise CountryDoesNotExist()
 
@@ -23,15 +30,15 @@ class Country:
 
     @classmethod
     def from_alpha_2(cls, alpha_2: str) -> Country:
-        return cls(pycountry.countries.get(alpha_2=alpha_2.upper()))
+        return cls(pycountry_object=pycountry.countries.get(alpha_2=alpha_2.upper()))
     
     @classmethod
     def from_alpha_3(cls, alpha_3: str) -> Country:
-        return cls(pycountry.countries.get(alpha_3=alpha_3.upper()))   
+        return cls(pycountry_object=pycountry.countries.get(alpha_3=alpha_3.upper()))   
 
     @classmethod
     def from_fuzzy(cls, fuzzy: str) -> Country:
-        return cls(pycountry.countries.search_fuzzy(fuzzy))
+        return cls(pycountry_object=pycountry.countries.search_fuzzy(fuzzy))
 
     @property
     def name(self) -> str:
