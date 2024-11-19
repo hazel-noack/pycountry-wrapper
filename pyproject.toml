@@ -1,0 +1,35 @@
+[project]
+name = "pycountry-wrapper"
+dependencies = []
+dynamic = ["version"]
+authors = []
+description = "This is a wrapper for pycountry, to make said library more usable."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+pycountry-wrapper = "pycountry_wrapper.__main__:cli"
+
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+directory = "dist"
+
+[tool.hatch.build.targets.sdist]
+include = ["pycountry_wrapper/*.py"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["pycountry_wrapper"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+path = "pycountry_wrapper/__about__.py"
