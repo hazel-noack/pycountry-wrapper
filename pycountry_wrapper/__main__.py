@@ -5,4 +5,4 @@ from . import Country
 def cli():
     print(f"Running {__name__} version {__version__} from __main__.py")
 
-    print(Country.from_alpha_2("DE"))
+    print(Country("DEU"))
