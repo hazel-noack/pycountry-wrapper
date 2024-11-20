@@ -1,9 +1,6 @@
 from __future__ import annotations
 import pycountry
 
-class CountryDoesNotExist(Exception): pass
-
-
 class Country:
     """
     This gets countries based on the ISO 3166-1 standart.
@@ -12,7 +9,7 @@ class Country:
     - Country.from_alpha_2("DE")
     - Country.from_alpha_3("DEU")
 
-    If the country couldn't be found, it raises the pycountry_wrapper.CountryDoesNotExist exception.
+    If the country couldn't be found, it raises a ValueError.
     """
 
     def __new__(cls, country: str = None, pycountry_object = None, silent: bool = False):
@@ -28,7 +25,7 @@ class Country:
         if pycountry_object is None:
             if silent:
                 return None
-            raise CountryDoesNotExist()
+            raise ValueError(f"Country {country} couldn't be found")
 
         self.pycountry_object = pycountry_object
         return self     

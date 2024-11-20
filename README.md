@@ -13,7 +13,7 @@ pip install pycountry-wrapper
 ## Usage
 
 ```python
-from pycountry_wrapper import Country, CountryDoesNotExist
+from pycountry_wrapper import Country
 
 germany = Country.from_alpha_2("DE")
 print(germany)
@@ -21,8 +21,8 @@ print(germany.name)
 
 try:
     does_not_exist = Country.from_alpha_2("EN")
-except CountryDoesNotExist:
-    # if the country wasn't found, this exception is thrown
+except ValueError:
+    # if the country wasn't found, a ValueError is raised
     pass
 ```
 
