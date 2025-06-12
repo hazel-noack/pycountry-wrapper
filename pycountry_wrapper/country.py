@@ -58,9 +58,14 @@ class Country:
         
         # fuzzy search if enabled
         if config.allow_fuzzy_search:
-            found_countries = pycountry.countries.search_fuzzy(country)
-            if len(found_countries):
-                return found_countries[0]
+            # fuzzy search raises lookup error if nothing was found
+            try:
+                found_countries = pycountry.countries.search_fuzzy(country)
+                if len(found_countries):
+                    return found_countries[0]
+            except LookupError:
+                pass
+            
 
     @classmethod
     def search(cls, country: Optional[str]) -> Optional[Country]:
