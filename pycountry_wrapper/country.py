@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional
 from functools import wraps
 import pycountry
+import pycountry.db
 
 from . import config
 
@@ -22,7 +23,7 @@ class Country:
     Empty objects return for every attribute None
     """  
 
-    def __init__(self, country: Optional[str] = None, pycountry_object = None) -> None: 
+    def __init__(self, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None) -> None: 
         if pycountry_object is None:
             # search for the country string instead if the pycountry_object isn't given
             # this also implements the optional fallback
@@ -31,11 +32,11 @@ class Country:
         if pycountry_object is None:
             raise EmptyCountryException(f"the country {country} was not found and config.fallback_country isn't set")
 
-        self.pycountry_object = pycountry_object
+        self.pycountry_object: pycountry.db.Country = pycountry_object
 
 
     @classmethod
-    def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False):
+    def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False) -> Optional[pycountry.db.Country]:
         # fallback to configured country if necessary 
         if country is None:
             if is_fallback:
