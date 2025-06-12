@@ -6,17 +6,6 @@ import pycountry
 from . import config
 
 
-def none_if_empty(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if self.is_empty:
-            return None
-
-        return func(self, *args, **kwargs)
-    
-    return wrapper
-
-
 class EmptyCountryException(ValueError):
     pass
 
@@ -34,17 +23,16 @@ class Country:
     """  
 
     def __init__(self, country: Optional[str] = None, pycountry_object = None) -> None: 
-        self.pycountry_object = pycountry_object
-
-        if self.pycountry_object is None:
+        if pycountry_object is None:
             # search for the country string instead if the pycountry_object isn't given
             # this also implements the optional fallback
-            self.pycountry_object = self._search_pycountry_object(country=country)
+            pycountry_object = self._search_pycountry_object(country=country)
 
-        
         if pycountry_object is None:
             raise EmptyCountryException(f"the country {country} was not found and config.fallback_country isn't set")
-        
+
+        self.pycountry_object = pycountry_object
+
 
     @classmethod
     def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False):
@@ -90,28 +78,23 @@ class Country:
         return cls(pycountry_object=pycountry.countries.search_fuzzy(fuzzy))
 
     @property
-    @none_if_empty
     def name(self) -> str:
         return self.pycountry_object.name
     
     @property
-    @none_if_empty
-    def alpha_2(self) -> Optional[str]:
+    def alpha_2(self) -> str:
         return self.pycountry_object.alpha_2
 
     @property
-    @none_if_empty
-    def alpha_3(self) -> Optional[str]:
+    def alpha_3(self) -> str:
         return self.pycountry_object.alpha_3
 
     @property
-    @none_if_empty
-    def numeric(self) -> Optional[str]:
+    def numeric(self) -> str:
         return self.pycountry_object.numeric
 
     @property
-    @none_if_empty
-    def official_name(self) -> Optional[str]:
+    def official_name(self) -> str:
         return self.pycountry_object.official_name
 
     def __str__(self) -> str:
