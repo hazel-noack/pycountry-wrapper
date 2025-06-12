@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Union
 from functools import wraps
+from typing_extensions import Self
 import pycountry
 import pycountry.db
 
@@ -22,7 +23,6 @@ class Country:
     If the country couldn't be found, it raises a ValueError, or creates an empty object.
     Empty objects return for every attribute None
     """  
-
     def __init__(self, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None) -> None: 
         if pycountry_object is None:
             # search for the country string instead if the pycountry_object isn't given
@@ -54,13 +54,13 @@ class Country:
         elif len(country) == 3:
             pycountry_object = pycountry.countries.get(alpha_3=country.upper())
         if pycountry_object is not None:
-            return cls(pycountry_object=pycountry_object) # type: ignore
+            return pycountry_object
         
         # fuzzy search if enabled
         if config.allow_fuzzy_search:
             found_countries = pycountry.countries.search_fuzzy(country)
             if len(found_countries):
-                return cls(pycountry_object=found_countries[0])  # type: ignore
+                return found_countries[0]
 
     @classmethod
     def search(cls, country: Optional[str]) -> Optional[Country]:
@@ -110,8 +110,10 @@ class EmptyCountry(Country):
     This will be used if you don't want to use a fallback country but you still want to be able to not have None
     You can access the same attributes but they will just return None
     """
-    def __init__(self) -> None:
-        pass
+    def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None):
+        print("new", country, pycountry_object)
+        return super().__new__(cls)
+
 
     @classmethod
     def search(cls, country: Optional[str]) -> Union[Country, EmptyCountry]:
