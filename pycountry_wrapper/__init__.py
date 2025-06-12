@@ -1,9 +1,9 @@
-from .country import Country, StrictCountry, EmptyCountryException
+from .country import Country, EmptyCountry, EmptyCountryException
 from . import config
 
 __all__ = [
     "Country",
-    "StrictCountry",
+    "EmptyCountry",
     "config",
     "EmptyCountryException",
 ]

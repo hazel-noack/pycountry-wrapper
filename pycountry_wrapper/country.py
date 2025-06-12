@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Union
 from functools import wraps
 import pycountry
 import pycountry.db
@@ -54,13 +54,13 @@ class Country:
         elif len(country) == 3:
             pycountry_object = pycountry.countries.get(alpha_3=country.upper())
         if pycountry_object is not None:
-            return cls(pycountry_object=pycountry_object)
+            return cls(pycountry_object=pycountry_object) # type: ignore
         
         # fuzzy search if enabled
         if config.allow_fuzzy_search:
             found_countries = pycountry.countries.search_fuzzy(country)
             if len(found_countries):
-                return cls(pycountry_object=found_countries[0]) 
+                return cls(pycountry_object=found_countries[0])  # type: ignore
 
     @classmethod
     def search(cls, country: Optional[str]) -> Optional[Country]:
@@ -76,7 +76,7 @@ class Country:
 
     @classmethod
     def from_fuzzy(cls, fuzzy: str) -> Country:
-        return cls(pycountry_object=pycountry.countries.search_fuzzy(fuzzy))
+        return cls(pycountry_object=pycountry.countries.search_fuzzy(fuzzy)) # type: ignore
 
     @property
     def name(self) -> str:
@@ -105,31 +105,18 @@ class Country:
         return self.pycountry_object.__repr__()
 
 
-class StrictCountry(Country):
+class EmptyCountry(Country):
     """
-    This works just like Country,
-    but the object cant be empty
+    This will be used if you don't want to use a fallback country but you still want to be able to not have None
+    You can access the same attributes but they will just return None
     """
+    def __init__(self) -> None:
+        pass
 
-    def __init__(self, country: Optional[str] = None, pycountry_object = None) -> None: 
-        super().__init__(country=country, pycountry_object=pycountry_object, allow_empty=False)
+    @classmethod
+    def search(cls, country: Optional[str]) -> Union[Country, EmptyCountry]:
+        result = super().search(country)
 
-    @property
-    def name(self) -> str:
-        return self.pycountry_object.name
-    
-    @property
-    def alpha_2(self) -> str:
-        return self.pycountry_object.alpha_2
-
-    @property
-    def alpha_3(self) -> str:
-        return self.pycountry_object.alpha_3
-
-    @property
-    def numeric(self) -> str:
-        return self.pycountry_object.numeric
-
-    @property
-    def official_name(self) -> str:
-        return self.pycountry_object.official_name
+        if result is None:
+            return EmptyCountry()
+        return result
