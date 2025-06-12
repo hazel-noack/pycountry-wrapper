@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Optional, Union
 from functools import wraps
-from typing_extensions import Self
 import pycountry
 import pycountry.db
 
@@ -120,7 +119,7 @@ class EmptyCountry(Country):
     This will be used if you don't want to use a fallback country but you still want to be able to not have None
     You can access the same attributes but they will just return None
     """
-    def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None, **kwargs):
+    def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None, **kwargs) -> Union[Country, EmptyCountry]:
         try:
             return Country(country=country, pycountry_object=pycountry_object, disable_fallback=True)
         except EmptyCountryException:
