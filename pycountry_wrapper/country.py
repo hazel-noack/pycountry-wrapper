@@ -116,14 +116,22 @@ class EmptyCountry(Country):
     You can access the same attributes but they will just return None
     """
     def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None):
-        print("new", country, pycountry_object)
-        return super().__new__(cls)
+        try:
+            return Country(country=country, pycountry_object=pycountry_object)
+        except EmptyCountryException:
+            return super().__new__(cls)
+        
+    def __init__(self, *args, **kwargs) -> None:
+        pass
 
+    name = None # type: ignore
+    alpha_2 = None # type: ignore
+    alpha_3 = None # type: ignore
+    numeric = None # type: ignore
 
-    @classmethod
-    def search(cls, country: Optional[str]) -> Union[Country, EmptyCountry]:
-        result = super().search(country)
+    def __str__(self) -> str:
+        return "EmptyCountry()"
 
-        if result is None:
-            return EmptyCountry()
-        return result
+    def __repr__(self) -> str:
+        return "EmptyCountry()"
+
