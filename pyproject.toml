@@ -3,7 +3,8 @@ name = "pycountry-wrapper"
 dependencies = [
     "pycountry~=24.6.1",
 ]
-dynamic = ["version"]
+version = "1.0.0"
+dynamic = []
 authors = []
 description = "This is a wrapper for pycountry, to make said library more usable."
 readme = "README.md"
@@ -32,6 +33,3 @@ packages = ["pycountry_wrapper"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
-
-[tool.hatch.version]
-path = "pycountry_wrapper/__about__.py"
