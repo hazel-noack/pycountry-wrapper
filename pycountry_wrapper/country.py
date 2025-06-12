@@ -13,15 +13,32 @@ class EmptyCountryException(ValueError):
 
 class Country:
     """
-    This gets countries based on the ISO 3166-1 standart.
+    A class representing a country based on the ISO 3166-1 standard, wrapping the pycountry library.
 
-    Two examples are:
-    - Country.from_alpha_2("DE")
-    - Country.from_alpha_3("DEU")
+    This class provides multiple ways to look up countries:
+    - By 2-letter alpha-2 code (e.g., "DE" for Germany)
+    - By 3-letter alpha-3 code (e.g., "DEU" for Germany)
+    - By fuzzy search of country names
+    - Directly from pycountry Country objects
 
-    If the country couldn't be found, it raises a ValueError, or creates an empty object.
-    Empty objects return for every attribute None
-    """  
+    The class supports optional fallback behavior when a country isn't found,
+    configurable through the module's config settings.
+
+    Examples:
+    >>> Country("Germany")  # Automatic detection
+    >>> Country.search("Germany")
+    >>> 
+    >>> Country.from_alpha_2("DE")  # Germany by alpha-2 code
+    >>> Country.from_alpha_3("DEU")  # Germany by alpha-3 code
+    >>> Country.from_fuzzy("Germany")  # Germany by name search
+
+    Raises:
+        EmptyCountryException: If the country cannot be found and no fallback is configured.  
+    
+    If you don't want to raise an Exception if no country you can create a Country instance by the following methods:  
+    - Country.search: returns None if nothing is found  
+    - initialize EmptyCountry instead: gives you either a Country instance or an EmptyCountry instance
+    """
     def __init__(
         self, 
         country: Optional[str] = None, 
@@ -73,6 +90,15 @@ class Country:
 
     @classmethod
     def search(cls, country: Optional[str]) -> Optional[Country]:
+        """
+        Search for a country and return None instead of raising if not found.
+
+        Args:
+            country: String to search for (name, alpha-2, or alpha-3 code)
+
+        Returns:
+            Country object if found, None otherwise
+        """
         return cls(pycountry_object=cls._search_pycountry_object(country=country))
 
     @classmethod
@@ -116,8 +142,19 @@ class Country:
 
 class EmptyCountry(Country):
     """
-    This will be used if you don't want to use a fallback country but you still want to be able to not have None
-    You can access the same attributes but they will just return None
+    A null-object pattern implementation of Country that returns None for all attributes.
+
+    >>> empty = EmptyCountry("InvalidCountry")
+    >>> print(empty.name)  # None
+    >>> print(empty)  # EmptyCountry()
+
+    It doubles as a factory, so if you instantiate the class you'll either get a Country object or EmptyCountry depending if it found a country.
+
+    >>> empty = EmptyCountry("InvalidCountry")
+    >>> print(type(empty))  # <class 'pycountry_wrapper.country.EmptyCountry'>
+    >>> 
+    >>> found = EmptyCountry("US")
+    >>> print(type(found))  # <class 'pycountry_wrapper.country.Country'>
     """
     def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None, **kwargs) -> Union[Country, EmptyCountry]:
         try:
