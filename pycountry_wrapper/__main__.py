@@ -1,11 +1,10 @@
-from .__about__ import __name__, __version__
+from . import __name__
 from . import Country, EmptyCountry, config
-
-import pycountry
 
 
 def cli():
-    print(f"Running {__name__} version {__version__} from __main__.py")
+    print(f"Running {__name__} from __main__.py")
+    import pycountry
     config.fallback_country = "US"
     t = pycountry.countries.get(alpha_2="DE")
 
