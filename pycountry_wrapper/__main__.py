@@ -17,3 +17,13 @@ def cli():
     empty_country = EmptyCountry(country="zwx")
     print(type(empty_country))
     print(empty_country)
+
+    print()
+    normal_country = Country("UK")
+    print(type(normal_country))
+    print(normal_country)
+
+    print()
+    fallback_country = Country("zwx")
+    print(type(fallback_country))
+    print(fallback_country)

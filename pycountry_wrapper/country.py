@@ -27,12 +27,12 @@ class Country:
         self, 
         country: Optional[str] = None, 
         pycountry_object: Optional[pycountry.db.Country] = None, 
-        force_disable_fallback: bool = False
+        disable_fallback: bool = False
     ) -> None: 
         if pycountry_object is None:
             # search for the country string instead if the pycountry_object isn't given
             # this also implements the optional fallback
-            pycountry_object = self._search_pycountry_object(country=country, force_disable_fallback=force_disable_fallback)
+            pycountry_object = self._search_pycountry_object(country=country, disable_fallback=disable_fallback)
 
         if pycountry_object is None:
             raise EmptyCountryException(f"the country {country} was not found and config.fallback_country isn't set")
@@ -41,35 +41,35 @@ class Country:
 
 
     @classmethod
-    def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False, force_disable_fallback: bool = False) -> Optional[pycountry.db.Country]:
-        # fallback to configured country if necessary 
-        if country is None and not force_disable_fallback:
-            if force_disable_fallback or config.fallback_country is None:
-                return None
-            
-            country = config.fallback_country
-            
+    def _search_pycountry_object(cls, country: Optional[str], disable_fallback: bool = False) -> Optional[pycountry.db.Country]:
         pycountry_object = None
 
-        # the reason I don't immediately return the result is because then there would be a chance 
-        # I would return None even though a country could be found through fuzzy search
-        country = country.strip()
-        if len(country) == 2:
-            pycountry_object = pycountry.countries.get(alpha_2=country.upper())
-        elif len(country) == 3:
-            pycountry_object = pycountry.countries.get(alpha_3=country.upper())
+        if country is not None:
+            # the reason I don't immediately return the result is because then there would be a chance 
+            # I would return None even though a country could be found through fuzzy search
+            country = country.strip()
+            if len(country) == 2:
+                pycountry_object = pycountry.countries.get(alpha_2=country.upper())
+            elif len(country) == 3:
+                pycountry_object = pycountry.countries.get(alpha_3=country.upper())
+            if pycountry_object is not None:
+                return pycountry_object
+            
+            # fuzzy search if enabled
+            if config.allow_fuzzy_search:
+                # fuzzy search raises lookup error if nothing was found
+                try:
+                    found_countries = pycountry.countries.search_fuzzy(country)
+                    if len(found_countries):
+                        return found_countries[0]
+                except LookupError:
+                    pass
+        
         if pycountry_object is not None:
             return pycountry_object
-        
-        # fuzzy search if enabled
-        if config.allow_fuzzy_search:
-            # fuzzy search raises lookup error if nothing was found
-            try:
-                found_countries = pycountry.countries.search_fuzzy(country)
-                if len(found_countries):
-                    return found_countries[0]
-            except LookupError:
-                pass
+
+        if config.fallback_country is not None and not disable_fallback:
+            return cls._search_pycountry_object(country=config.fallback_country, disable_fallback=True)
             
 
     @classmethod
@@ -122,7 +122,7 @@ class EmptyCountry(Country):
     """
     def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None, **kwargs):
         try:
-            return Country(country=country, pycountry_object=pycountry_object, force_disable_fallback=False)
+            return Country(country=country, pycountry_object=pycountry_object, disable_fallback=True)
         except EmptyCountryException:
             return super().__new__(cls)
         
