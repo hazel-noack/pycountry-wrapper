@@ -23,11 +23,16 @@ class Country:
     If the country couldn't be found, it raises a ValueError, or creates an empty object.
     Empty objects return for every attribute None
     """  
-    def __init__(self, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None) -> None: 
+    def __init__(
+        self, 
+        country: Optional[str] = None, 
+        pycountry_object: Optional[pycountry.db.Country] = None, 
+        force_disable_fallback: bool = False
+    ) -> None: 
         if pycountry_object is None:
             # search for the country string instead if the pycountry_object isn't given
             # this also implements the optional fallback
-            pycountry_object = self._search_pycountry_object(country=country)
+            pycountry_object = self._search_pycountry_object(country=country, force_disable_fallback=force_disable_fallback)
 
         if pycountry_object is None:
             raise EmptyCountryException(f"the country {country} was not found and config.fallback_country isn't set")
@@ -36,13 +41,13 @@ class Country:
 
 
     @classmethod
-    def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False) -> Optional[pycountry.db.Country]:
+    def _search_pycountry_object(cls, country: Optional[str], is_fallback: bool = False, force_disable_fallback: bool = False) -> Optional[pycountry.db.Country]:
         # fallback to configured country if necessary 
-        if country is None:
-            if is_fallback:
+        if country is None and not force_disable_fallback:
+            if force_disable_fallback or config.fallback_country is None:
                 return None
             
-            return cls._search_pycountry_object(country=config.fallback_country, is_fallback=True)
+            country = config.fallback_country
             
         pycountry_object = None
 
@@ -115,9 +120,9 @@ class EmptyCountry(Country):
     This will be used if you don't want to use a fallback country but you still want to be able to not have None
     You can access the same attributes but they will just return None
     """
-    def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None):
+    def __new__(cls, country: Optional[str] = None, pycountry_object: Optional[pycountry.db.Country] = None, **kwargs):
         try:
-            return Country(country=country, pycountry_object=pycountry_object)
+            return Country(country=country, pycountry_object=pycountry_object, force_disable_fallback=False)
         except EmptyCountryException:
             return super().__new__(cls)
         
