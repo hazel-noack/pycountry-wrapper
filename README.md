@@ -74,3 +74,14 @@ country.official_name
 ```
 
 If you have an `EmptyCountry` these attributes will all be `None`.
+
+### Configuring behavior
+
+If you want to set a fallback country or disable fuzzy search you can do that with the config module.
+
+```python
+from pycountry_wrapper import config
+
+config.fallback_country = "US"
+config.allow_fuzzy_search = False
+```
