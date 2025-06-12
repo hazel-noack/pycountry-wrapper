@@ -17,6 +17,10 @@ def none_if_empty(func):
     return wrapper
 
 
+class EmptyCountryException(ValueError):
+    pass
+
+
 class Country:
     """
     This gets countries based on the ISO 3166-1 standart.
@@ -39,7 +43,7 @@ class Country:
 
         
         if pycountry_object is None:
-            raise ValueError(f"Country {country} couldn't be found")
+            raise EmptyCountryException(f"the country {country} was not found and config.fallback_country isn't set")
         
 
     @classmethod
@@ -86,12 +90,8 @@ class Country:
         return cls(pycountry_object=pycountry.countries.search_fuzzy(fuzzy))
 
     @property
-    def is_empty(self) -> bool:
-        return self.pycountry_object is None
-
-    @property
     @none_if_empty
-    def name(self) -> Optional[str]:
+    def name(self) -> str:
         return self.pycountry_object.name
     
     @property
