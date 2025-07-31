@@ -5,7 +5,10 @@ dependencies = [
 ]
 version = "1.0.0"
 dynamic = []
-authors = []
+authors = [
+    {name = "Hazel Noack", email = "hazel@webcontact.de"},
+]
+
 description = "This is a wrapper for pycountry, to make said library more usable."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -14,6 +17,10 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[project.urls]
+Homepage = "https://github.com/hazel-noack/pycountry-wrapper"
+Issues = "https://github.com/hazel-noack/pycountry-wrapper/issues"
 
 [project.scripts]
 pycountry-wrapper = "pycountry_wrapper.__main__:cli"
