@@ -1,5 +1,7 @@
 # Pycountry-Wrapper
 
+![publishing workflow](https://github.com/hazel-noack/pycountry-wrapper/actions/workflows/python-publish.yml/badge.svg)
+
 This is a wrapper for pycountry, to make said library more usable.
 
 ## Installation
